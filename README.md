@@ -1,7 +1,7 @@
 # HerBERT 
 **[HerBERT](https://en.wikipedia.org/wiki/Zbigniew_Herbert)** is a BERT-based Language Model trained on Polish Corpora
 using only MLM objective with dynamic masking of whole words. For more details, please refer to: 
-[KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://arxiv.org/abs/2005.00630).
+[KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://www.aclweb.org/anthology/2020.acl-main.111.pdf).
 
 ## Dataset
 **HerBERT** training dataset is a combination of several publicly available corpora for Polish language:
