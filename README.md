@@ -1,69 +1,69 @@
 # HerBERT 
-**[HerBERT](https://en.wikipedia.org/wiki/Zbigniew_Herbert)** is a BERT-based Language Model trained on Polish Corpora
-using only MLM objective with dynamic masking of whole words. For more details, please refer to: 
-[KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://www.aclweb.org/anthology/2020.acl-main.111.pdf).
+**[HerBERT](https://en.wikipedia.org/wiki/Zbigniew_Herbert)** is a series of BERT-based language models trained for Polish language understanding.
 
-## Dataset
-**HerBERT** training dataset is a combination of several publicly available corpora for Polish language:
+All three HerBERT models are summarized below:
 
-| Corpus | Tokens | Texts |
-| :------ | ------: | ------: |
-| [OSCAR](https://traces1.inria.fr/oscar/)| 6710M  | 145M |
-| [Open Subtitles](http://opus.nlpl.eu/OpenSubtitles-v2018.php) | 1084M  | 1.1M |
-| [Wikipedia](https://dumps.wikimedia.org/) | 260M  | 1.5M |
-| [Wolne Lektury](https://wolnelektury.pl/) | 41M  | 5.5k |
-| [Allegro Articles](https://allegro.pl/artykuly) | 18M  | 33k |
+| Model | Tokenizer | Vocab Size | Batch Size | Train Steps | KLEJ Score |
+| :---- | --------: | ---------: | ---------: | ----------: | ---------: | 
+| `herbert-klej-cased-v1` | BPE | 50K | 570 | 180k | 80.5 |
+| `herbert-base-cased` | BPE-Dropout | 50K | 2560 | 50k | 86.3 |
+| `herbert-large-cased` | BPE-Dropout | 50K | 2560 | 60k | 88.4 |
 
-## Tokenizer
-The training dataset was tokenized into subwords using [HerBERT Tokenizer](https://huggingface.co/allegro/herbert-klej-cased-tokenizer-v1); a character level byte-pair encoding with
-a vocabulary size of 50k tokens. The tokenizer itself was trained on [Wolne Lektury](https://wolnelektury.pl/) and a publicly available subset of 
-[National Corpus of Polish](http://nkjp.pl/index.php?page=14&lang=0) with a [fastBPE](https://github.com/glample/fastBPE) library.
+Full KLEJ Benchmark leaderboard is available [here](https://klejbenchmark.com/leaderboard). 
 
-Tokenizer utilizes `XLMTokenizer` implementation for that reason, one should load it as `allegro/herbert-klej-cased-tokenizer-v1`.
-
-## HerBERT models summary
-| Model | WWM | Cased | Tokenizer | Vocab Size  | Batch Size | Train Steps |
-| :------ | ------: | ------: | ------: | ------: | ------: | ------: |
-| herbert-klej-cased-v1 | YES | YES | BPE | 50K | 570 | 180k | 
-
-## Model evaluation
-HerBERT was evaluated on the [KLEJ](https://klejbenchmark.com/) benchmark, publicly available set of nine evaluation tasks for the Polish language understanding.
-It had the best average performance and obtained the best results for three of them.
-
-| Model | Average | NKJP-NER | CDSC-E | CDSC-R | CBD | PolEmo2.0-IN	|PolEmo2.0-OUT | DYK | PSC | AR	|
-| :------ | ------: | ------: | ------: | ------: | ------: | ------: | ------: |  ------: | ------: | ------: |
-| herbert-klej-cased-v1 | **80.5** | 92.7 | 92.5 | 91.9 | **50.3** | **89.2** |**76.3** |52.1 |95.3 | 84.5 |
-
-Full leaderboard is available [online](https://klejbenchmark.com/leaderboard). 
+For more details about model architecture, training process, used corpora and evaluation please refer to: 
+- [KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://www.aclweb.org/anthology/2020.acl-main.111.pdf)
+- [HerBERT: Efficiently Pretrained Transformer-based Language Model for Polish](https://www.aclweb.org/anthology/2021.bsnlp-1.1/).
 
 
-## HerBERT usage
-Model training and experiments were conducted with [transformers](https://github.com/huggingface/transformers) in version 2.0.
-
-Example code:
+## Usage
+Example of how to load the model:
 ```python
-from transformers import XLMTokenizer, RobertaModel
+from transformers import AutoTokenizer, AutoModel
 
-tokenizer = XLMTokenizer.from_pretrained("allegro/herbert-klej-cased-tokenizer-v1")
-model = RobertaModel.from_pretrained("allegro/herbert-klej-cased-v1")
+model_names = {
+    "herbert-klej-cased-v1": {
+        "tokenizer": "allegro/herbert-klej-cased-tokenizer-v1", 
+        "model": "allegro/herbert-klej-cased-v1",
+    },
+    "herbert-base-cased": {
+        "tokenizer": "allegro/herbert-base-cased", 
+        "model": "allegro/herbert-base-cased",
+    },
+    "herbert-large-cased": {
+        "tokenizer": "allegro/herbert-large-cased", 
+        "model": "allegro/herbert-large-cased",
+    },
+}
 
-encoded_input = tokenizer.encode("Kto ma lepszą sztukę, ma lepszy rząd – to jasne.", return_tensors='pt')
-outputs = model(encoded_input)
+tokenizer = AutoTokenizer.from_pretrained(model_names["allegro/herbert-base-cased"]["tokenizer"])
+model = AutoModel.from_pretrained(model_names["allegro/herbert-base-cased"]["model"])
+)
 ```
 
-HerBERT can also be loaded using `AutoTokenizer` and `AutoModel`:
-
+And how to use the model:
 ```python
-tokenizer = AutoTokenizer.from_pretrained("allegro/herbert-klej-cased-tokenizer-v1")
-model = AutoModel.from_pretrained("allegro/herbert-klej-cased-v1")
+output = model(
+    **tokenizer.batch_encode_plus(
+        [
+            (
+                "A potem szedł środkiem drogi w kurzawie, bo zamiatał nogami, ślepy dziad prowadzony przez tłustego kundla na sznurku.",
+                "A potem leciał od lasu chłopak z butelką, ale ten ujrzawszy księdza przy drodze okrążył go z dala i biegł na przełaj pól do karczmy."
+            )
+        ],
+    padding='longest',
+    add_special_tokens=True,
+    return_tensors='pt'
+    )
 ```
 
 ## License
-CC BY-SA 4.0
+CC BY 4.0
 
 ## Citation
-If you use this model, please cite the following paper:
+If you use this model, please cite the following papers:
 
+The `herbert-klej-cased-v1` version of the model:
 ```
 @inproceedings{rybak-etal-2020-klej,
     title = "{KLEJ}: Comprehensive Benchmark for Polish Language Understanding",
@@ -78,7 +78,23 @@ If you use this model, please cite the following paper:
 }
 ```
 
-## Authors
-Model was trained by **Allegro Machine Learning Research** team.
+The `herbert-base-cased` or `herbert-large-cased` version of the model:
+```
+@inproceedings{mroczkowski-etal-2021-herbert,
+    title = "{H}er{BERT}: Efficiently Pretrained Transformer-based Language Model for {P}olish",
+    author = "Mroczkowski, Robert  and
+      Rybak, Piotr  and
+      Wr{\'o}blewska, Alina  and
+      Gawlik, Ireneusz",
+    booktitle = "Proceedings of the 8th Workshop on Balto-Slavic Natural Language Processing",
+    month = apr,
+    year = "2021",
+    address = "Kiyv, Ukraine",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/2021.bsnlp-1.1",
+    pages = "1--10",
+}
+```
 
+## Contact
 You can contact us at: <a href="mailto:klejbenchmark@allegro.pl">klejbenchmark@allegro.pl</a>
