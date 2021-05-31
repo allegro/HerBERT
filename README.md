@@ -12,7 +12,7 @@ All three HerBERT models are summarized below:
 Full KLEJ Benchmark leaderboard is available [here](https://klejbenchmark.com/leaderboard). 
 
 For more details about model architecture, training process, used corpora and evaluation please refer to: 
-- [KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://www.aclweb.org/anthology/2020.acl-main.111.pdf)
+- [KLEJ: Comprehensive Benchmark for Polish Language Understanding](https://www.aclweb.org/anthology/2020.acl-main.111/)
 - [HerBERT: Efficiently Pretrained Transformer-based Language Model for Polish](https://www.aclweb.org/anthology/2021.bsnlp-1.1/).
 
 
