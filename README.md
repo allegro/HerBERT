@@ -38,7 +38,6 @@ model_names = {
 
 tokenizer = AutoTokenizer.from_pretrained(model_names["allegro/herbert-base-cased"]["tokenizer"])
 model = AutoModel.from_pretrained(model_names["allegro/herbert-base-cased"]["model"])
-)
 ```
 
 And how to use the model:
@@ -51,10 +50,11 @@ output = model(
                 "A potem leciał od lasu chłopak z butelką, ale ten ujrzawszy księdza przy drodze okrążył go z dala i biegł na przełaj pól do karczmy."
             )
         ],
-    padding='longest',
-    add_special_tokens=True,
-    return_tensors='pt'
+        padding="longest",
+        add_special_tokens=True,
+        return_tensors="pt",
     )
+)
 ```
 
 ## License
