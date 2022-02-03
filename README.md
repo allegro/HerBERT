@@ -36,8 +36,8 @@ model_names = {
     },
 }
 
-tokenizer = AutoTokenizer.from_pretrained(model_names["allegro/herbert-base-cased"]["tokenizer"])
-model = AutoModel.from_pretrained(model_names["allegro/herbert-base-cased"]["model"])
+tokenizer = AutoTokenizer.from_pretrained(model_names["herbert-base-cased"]["tokenizer"])
+model = AutoModel.from_pretrained(model_names["herbert-base-cased"]["model"])
 ```
 
 And how to use the model:
